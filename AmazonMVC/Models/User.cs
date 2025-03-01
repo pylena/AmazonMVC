@@ -7,7 +7,7 @@ namespace AmazonMVC.Models
         [Key]
         public int UserId { get; set; }
         public string Username { get; set; }
-        public ICollection<Order> Orders { get; }
+        //public ICollection<Order> Orders { get; }
 
         
 

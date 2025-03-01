@@ -9,7 +9,13 @@ namespace AmazonMVC.Controllers
     public class OrderController : Controller
     {
         private static List<Order> orders = new List<Order>();
-        private static int currentOrderId = 1;
+        private static List<Product> products = new List<Product>
+    {
+        new Product { ProductID = 1, Name = "Laptop", Category = "Electronics", Price = 1000, StockQuantity = 10 },
+        new Product { ProductID = 2, Name = "Phone", Category = "Electronics", Price = 500, StockQuantity = 20 },
+        new Product { ProductID = 3, Name = "Headphones", Category = "Accessories", Price = 200, StockQuantity = 30 }
+    };
+
 
         /*
         private readonly AppDBContext _db;
@@ -27,59 +33,78 @@ namespace AmazonMVC.Controllers
         */
         // GET: Products to display on Order Form
 
-        public IActionResult PlaceOrder(int userId, List<int> productIds, List<int> quantities)
+        // GET: /Orders/Create
+        public ActionResult Create()
         {
-            // Validate the order (simple validation for this example)
-            if (productIds.Count != quantities.Count)
+            var viewModel = new OrderViewModel
             {
-                ModelState.AddModelError("", "Product and quantity lists must match.");
-                return View("Error");
+                Products = products
+            };
+            return View(viewModel);
+        }
+
+       
+        [HttpPost]
+        public ActionResult Create(OrderViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Products = products;
+                return View(model);
             }
 
-            // Create OrderDetails and calculate SubTotal
-            List<OrderDetails> orderDetails = new List<OrderDetails>();
-            decimal total = 0;
-            for (int i = 0; i < productIds.Count; i++)
+            if (model.SelectedProductIDs.Count != model.Quantities.Count)
             {
-                var product = ProductController.GetProductById(productIds[i]);
-                if (product == null)
-                {
-                    ModelState.AddModelError("", "Product not found.");
-                    return View("Error");
-                }
-                int quantity = quantities[i];
-                decimal subTotal = product.Price * quantity;
-                total += subTotal;
-
-                orderDetails.Add(new OrderDetails
-                {
-                    OrderDetailID = i + 1,
-                    OrderID = currentOrderId,
-                    ProductID = product.ProductID,
-                    Quantity = quantity,
-                    SubTotal = subTotal
-                });
+                ModelState.AddModelError("", "Mismatch between selected products and quantities.");
+                model.Products = products;
+                return View(model);
             }
 
-            // Create Order
-            Order order = new Order
+            var order = new Order
             {
-                OrderID = currentOrderId++,
-                UserID = userId,
-                OrderDetails = orderDetails
+                OrderID = orders.Count + 1,
+                UserID = model.UserID,
+                OrderDetails = new List<OrderDetails>()
             };
 
+            for (int i = 0; i < model.SelectedProductIDs.Count; i++)
+            {
+                var product = products.FirstOrDefault(p => p.ProductID == model.SelectedProductIDs[i]);
+                if (product != null && model.Quantities[i] > 0 && model.Quantities[i] <= product.StockQuantity)
+                {
+                    order.OrderDetails.Add(new OrderDetails
+                    {
+                        OrderDetailID = order.OrderDetails.Count + 1,
+                        OrderID = order.OrderID,
+                        ProductID = product.ProductID,
+                        Quantity = model.Quantities[i],
+                        SubTotal = product.Price * model.Quantities[i]
+                    });
+
+                    // Reduce stock quantity
+                    product.StockQuantity -= model.Quantities[i];
+                }
+                else
+                {
+                    ModelState.AddModelError("", $"Invalid quantity for {product?.Name}. Check stock availability.");
+                    model.Products = products;
+                    return View(model);
+                }
+            }
+
             orders.Add(order);
-            return View("OrderHistory", orders);
+            return RedirectToAction("OrderHistory", new { userId = model.UserID });
         }
 
-        public IActionResult OrderHistory(int userId)
+        // GET: /Orders/{userId}
+        public ActionResult OrderHistory(int userId)
         {
-            var userOrders = orders.FindAll(o => o.UserID == userId);
+            var userOrders = orders.Where(o => o.UserID == userId).ToList();
             return View(userOrders);
         }
-
-
     }
+
+
 }
+
 

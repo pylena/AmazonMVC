@@ -1,32 +1,41 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model List<AmazonMVC.Models.Order>
+
 @{
+    ViewBag.Title = "Order History";
 }
-@model List<Order>
 
 <h2>Order History</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var order in Model)
-        {
+
+@if (Model.Count == 0)
+{
+    <p>No orders found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
             <tr>
-                <td>@order.OrderID</td>
-                <td>
-                    <ul>
-                        @foreach (var detail in order.OrderDetails)
-                        {
-                            <li>@detail.ProductID - @detail.Quantity x @detail.SubTotal</li>
-                        }
-                    </ul>
-                </td>
+                <th>Order ID</th>
+                <th>Products</th>
+                <th>Total Price</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>@order.OrderID</td>
+                    <td>
+                        <ul>
+                            @foreach (var detail in order.OrderDetails)
+                            {
+                                <li>Product ID: @detail.ProductID, Quantity: @detail.Quantity, SubTotal: @detail.SubTotal</li>
+                            }
+                        </ul>
+                    </td>
+                    <td>@order.OrderDetails.Sum(d => d.SubTotal)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

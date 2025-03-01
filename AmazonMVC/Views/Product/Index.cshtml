@@ -5,10 +5,19 @@
 }
 @model List<Product>
 
-<h2>Product List</h2>
-<ul>
+<h2 class="mb-3 text-primary">Product List</h2>
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 mt-4 ">
+        <div class="card-body">
+<ul class="list-group">
     @foreach (var product in Model)
     {
-        <li>@product.Name - @product.Price</li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span class="fw-bold">@product.Name</span>
+            <span class="badge bg-success p-2">$@product.Price</span>
+        </li>
     }
 </ul>
+</div>
+</div>
+</div>

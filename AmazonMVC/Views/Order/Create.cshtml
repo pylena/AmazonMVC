@@ -1,0 +1,48 @@
+﻿@model AmazonMVC.Models.OrderViewModel
+
+@{
+    ViewBag.Title = "Create Order";
+}
+
+<h2>Create Order</h2>
+
+@using (Html.BeginForm("Create", "Orders", FormMethod.Post))
+{
+    <div class="form-group">
+        <label>User ID:</label>
+        @Html.TextBoxFor(m => m.UserID, new { @class = "form-control", required = "required" })
+    </div>
+
+    <h3>Products</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Products.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="SelectedProductIDs" value="@Model.Products[i].ProductID" />
+                    </td>
+                    <td>@Model.Products[i].Name</td>
+                    <td>@Model.Products[i].Category</td>
+                    <td>@Model.Products[i].Price</td>
+                    <td>@Model.Products[i].StockQuantity</td>
+                    <td>
+                        <input type="number" name="Quantities" min="1" max="@Model.Products[i].StockQuantity" class="form-control" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Place Order</button>
+}
