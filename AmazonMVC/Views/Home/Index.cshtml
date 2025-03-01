@@ -1,8 +1,28 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "About Us";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <h1 class="text-center text-primary">@ViewData["Title"]</h1>
+
+    <div class="card shadow-lg p-4 mt-4">
+        <div class="card-body">
+            <h4 class="card-title text-dark">Amazon sa Order Management System</h4>
+            <p class="card-text">
+                OrderEase is a streamlined order management system designed to simplify the ordering process for users and businesses.
+            </p>
+
+            <h5 class="text-success mt-3">Why Choose OrderEase?</h5>
+            <ul class="list-group">
+                <li class="list-group-item">✔️ Seamless order creation & tracking</li>
+                <li class="list-group-item">✔️ User-friendly interface</li>
+            </ul>
+
+            <div class="text-center mt-4">
+                <a href="@Url.Action("Create", "Order")" class="btn btn-primary btn-lg">
+                    Start Your Order
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

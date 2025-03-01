@@ -13,7 +13,7 @@ namespace AmazonMVC.Controllers
         new Product { ProductID = 3, Name = "Coffee Mug", Category = "Kitchen", Price = 15, StockQuantity = 200 }
     };
 
-        public IActionResult Index()
+        public IActionResult ProductList()
         {
             return View(products);
         }
